@@ -1,0 +1,154 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no,minimal-ui" name="viewport"/>
+    <title>jq滚动到底部自动加载|幸凡学习网</title>
+    <link rel="stylesheet" href="perfect-scrollbar0.5.5/perfect-scrollbar.min.css"/>
+    <style>
+        html,body,ul,li{margin:0;padding:0;border:0;vertical-align:baseline;}
+        body,html{line-height:1;font-family:"Microsoft YaHei",Arial,Helvetica,sans-serif;font-size:16px;color:#333;}
+        ol,ul{list-style:none;}
+        a{text-decoration:none;}
+        body{background:#f2f2f2;}
+        .prolist {
+            display: none;
+        }
+        .prolist li{height:50px;line-height:50px;border-bottom:1px solid #f8f8f8;background:#fff;padding:0 15px;text-overflow:ellipsis;overflow:hidden;white-space:nowrap;}
+        .prolist li a{color:#333;font-size:16px;}
+
+        /**加载效果旋转**/
+        @-webkit-keyframes rotate {0% {-webkit-transform: rotate(0deg);transform: rotate(0deg);}100% {-webkit-transform: rotate(360deg);transform: rotate(360deg);}}
+        @keyframes rotate {0% {-webkit-transform: rotate(0deg);transform: rotate(0deg);}100% {-webkit-transform: rotate(360deg);transform: rotate(360deg);}}
+
+        .loadmore {display:block;line-height: 50px;text-align:center;color:#ccc;font-size:14px;}
+        .loadmore span{height:20px;width:20px;border-radius:100%;display:inline-block;margin:10px;border:2px solid #f60;border-bottom-color: transparent;vertical-align: middle;-webkit-animation: rotate 1.1s infinite linear;animation: rotate 1.1s infinite linear;}
+        .loadover{position:relative;margin:0 12px;padding:24px 0;height:20px;line-height:20px;color:#909090;text-align: center;}
+        .loadover span{position:relative;display:inline-block;padding:0 6px;height:20px;background:#F2F2F2;z-index:2}
+        .loadover:after {content:''position: absolute;left: 0;top:50%;width: 100%;height:1px;background:#DCDCDC;z-index:1;display:block;}
+        .main {
+            position: relative;
+            height: 300px;
+            overflow: hidden;
+            /*overflow-y: scroll;*/
+        }
+        .tab ul li {
+            float: left;
+            margin-right: 30px;
+            cursor: pointer;
+        }
+        .tab ul li.current {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+<div class="tab">
+    <ul>
+        <li class="current">tab1</li>
+        <li>tab2</li>
+    </ul>
+</div>
+<div class="main">
+    <!-- 产品列表 开始-->
+    <ul class="prolist" id="prolist1" style="display: block">
+        <li><a href="">好经典人生语句，经典得让人心痛！</a></li>
+        <li><a href="">好经典人生语句，经典得让人心痛！</a></li>
+        <li><a href="">好经典人生语句，经典得让人心痛！</a></li>
+        <li><a href="">好经典人生语句，经典得让人心痛！</a></li>
+        <li><a href="">好经典人生语句，经典得让人心痛！</a></li>
+        <li><a href="?">好经典人生语句，经典得让人心痛！</a></li>
+        <li><a href="?">好经典人生语句，经典得让人心痛！</a></li>
+        <li><a href="?">好经典人生语句，经典得让人心痛！</a></li>
+        <li><a href="?">好经典人生语句，经典得让人心痛！</a></li>
+    </ul>
+    <!-- 产品列表 结束 -->
+    <ul class="prolist" id="prolist2">
+        <li><a href="">好经典人生语句，经典得让人心痛！</a></li>
+        <li><a href="">好经典人生语句，经典得让人心痛！</a></li>
+        <li><a href="">好经典人生语句，经典得让人心痛！</a></li>
+        <li><a href="">好经典人生语句，经典得让人心痛！</a></li>
+        <li><a href="">好经典人生语句，经典得让人心痛！</a></li>
+        <li><a href="">好经典人生语句，经典得让人心痛！</a></li>
+        <li><a href="">好经典人生语句，经典得让人心痛！</a></li>
+        <li><a href="">好经典人生语句，经典得让人心痛！</a></li>
+        <li><a href="">好经典人生语句，经典得让人心痛！</a></li>
+    </ul>
+</div>
+
+
+<script type="text/javascript" src="http://www.86y.org/js/jquery.min.js"></script>
+<script type="text/javascript" src="perfect-scrollbar0.5.5/perfect-scrollbar.min.js"></script>
+<script>
+
+    $(function(){
+
+        $('.tab ul li').click(function(){
+            $(this).addClass('current').siblings().removeClass('current');
+            $('.main .prolist').hide().eq($(this).index()).show();
+            $('.main').scrollTop(0);
+        });
+
+        $('.main').perfectScrollbar();
+
+        loadMore('prolist1');
+
+    });
+
+
+    var vid=0;
+    var mythis;
+    var contentH=0;
+    var scrollTop=0;
+    var viewH = 0;
+    function loadMore(id){
+        $(".main").scroll(function(){
+            $('.tab ul li').each(function(){
+                if($(this).hasClass('current')){
+                    var index = $(this).index();
+                    if(index == 0){
+                        id = 'prolist1'
+                    }else if(index == 1){
+                        id = 'prolist2'
+                    }
+                }
+            });
+            mythis =$(this);
+            viewH =$(this).height();//可见高度
+            contentH =$('#'+id+'').height();//内容高度
+            scrollTop =$(this).scrollTop();//滚动高度
+            //if(contentH - viewH - scrollTop <= 100) { //到达底部100px时,加载新内容
+
+            if(scrollTop == 0){
+               // alert('到顶');
+            }else if(scrollTop == ( contentH -viewH)){
+                // 这里加载数据..
+//              alert('daodi');
+
+                if($(".loadmore").length==0)
+                {
+                    var txt='<div class="loadmore"><span class="loading"></span>加载中..</div>'
+                    $("body").append(txt);
+                }
+
+                var result = "";
+                for(var i = 0; i < 6; i++){
+                    vid++;
+                    result+='<li>'
+                            +'<a href="">好经典人生语句，经典得让人心痛！'+id+'</a>'
+                            +'</li>'
+                }
+                setTimeout(function(){
+                    $(".loadmore").remove();
+                    $('#'+id+'').append(result);
+
+                },1000);
+            }
+        });
+    }
+</script>
+<script>
+
+</script>
+</body>
+</html>
